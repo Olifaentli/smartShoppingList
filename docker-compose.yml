@@ -1,0 +1,14 @@
+services:
+  php:
+    build: .
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src:/var/www/html
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: einkaufsliste
+    ports:
+      - "3306:3306"
