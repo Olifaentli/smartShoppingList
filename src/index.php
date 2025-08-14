@@ -1,76 +1,39 @@
 <?php
-echo "Willkommen bei smartShoppingList!";
-$test="<h2>geil</h2>";
-$string="hallo";
-$number=2;
-$float =2.5;
 
-$date = new DateTime();
 
-$array = ["miau", "wau", "geil"];
-$array = ["hund" => ["atlas", "loki"], "katz" => [] ];
+require_once __DIR__ . '/vendor/autoload.php';
 
-function printDate(DateTime $date) {
-    echo $date->format('d.m.Y');
+use App\Utils\Config;
+use App\Utils\Container;
+
+$container = new Container();
+$controllerName = $_GET['controller'] ?? Config::DEFAULT_CONTROLLER;
+$controller = $container->getController($controllerName);
+
+if (!$controller) {
+    http_response_code(404);
+    exit('Controller not found');
 }
 
-enum dogs
-{
-    case Atlas;
-    case Loki;
+$method = $_SERVER['REQUEST_METHOD'];
 
+if ($method === 'GET') {
+    if (!method_exists($controller, 'template')) {
+        http_response_code(404);
+        exit('Template method not found');
+    }
+    $controller->template();
+
+} elseif ($method === 'POST') {
+    $action = $_GET['action'] ?? Config::DEFAULT_ACTION_REGISTER;
+    if (!method_exists($controller, $action)) {
+        http_response_code(404);
+        exit('Action not found');
+    }
+    $controller->$action();
+
+} else {
+    http_response_code(405);
+    header('Allow: GET, POST');
+    echo "HTTP method $method not supported.";
 }
-
-
-class dog
-{
-    private ?string $race = null;
-
-    public function __construct(?string $race = null)
-    {
-        $this->race = $race;
-    }
-    public function getRace(): string
-    {
-        return $this->race;
-    }
-
-    public function bark(): void
-    {
-        echo "wau";
-    }
-
-    public function __toString(): string
-    {
-        return $this->race;
-    }
-
-}
-
-$atlas = new dog("labischefer");
-
-
-
-?>
-<h1>hallo</h1>
-<?php
-echo printDate(new DateTime());
-$atlas->bark();
-echo "<br>";
-echo "<br>";
-echo "<br>";
-
-var_dump($_REQUEST);
-echo "<br>";
-echo "<br>";
-echo "<br>";
-echo "<br>";
-var_dump($_ENV);
-echo "<br>";
-echo "<br>";
-echo "<br>";
-echo "<br>";
-echo "<br>";
-
-echo $atlas;
-?>
