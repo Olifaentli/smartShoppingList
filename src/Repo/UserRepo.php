@@ -8,7 +8,7 @@ use App\Utils\DB;
 use PDO;
 use PDOException;
 
-class UserRepo
+class UserRepo extends DB
 {
     private DB $db;
 

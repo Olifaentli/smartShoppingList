@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Utils\Config;
@@ -22,6 +23,7 @@ class RegisterController {
     public function register(): void {
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
+        $error = '';
 
         if ($email && $password !== '') {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -37,17 +39,19 @@ class RegisterController {
 
                 header("Location: index.php?controller=login&action=template&success=1");
                 exit;
+
             } catch (PDOException $e) {
                 if ($e->getCode() === '23000') {
-                    $error = "Diese E-Mail ist bereits registriert.";
+                    $error = $this->strings['email_exists'];
                 } else {
-                    $error = "Fehler bei der Registrierung: " . htmlspecialchars($e->getMessage());
+                    $error = $this->strings['register_error'] . htmlspecialchars($e->getMessage());
                 }
             }
         } else {
-            $error = "Bitte gib eine gültige E-Mail und ein Passwort ein.";
+            $error = $this->strings['invalid_input'];
         }
 
+        $message = "<div class='message error'>{$error}</div>";
         include __DIR__ . '/../Templates/register.php';
     }
 }

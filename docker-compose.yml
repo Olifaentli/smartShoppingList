@@ -9,6 +9,7 @@ services:
     image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: einkaufsliste
+      MYSQL_DATABASE: smartshopping
     ports:
       - "3306:3306"
+

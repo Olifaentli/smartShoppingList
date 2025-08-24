@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repo\UserRepo;
-use App\Utils\DB;
 
 class LoginController
 {
@@ -15,15 +14,15 @@ class LoginController
         $this->userRepo = $userRepo;
     }
 
-    public function template()
+    public function template(): void
     {
         session_start();
         $message = $_SESSION['login_message'] ?? '';
-        unset($_SESSION['login_message']); // Nur 1x anzeigen
+        unset($_SESSION['login_message']);
         include __DIR__ . '/../Templates/login.php';
     }
 
-    public function login()
+    public function login(): void
     {
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';

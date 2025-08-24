@@ -2,26 +2,37 @@
 
 namespace App\Controller;
 
-class ListController
-{
-    public function template(): void
-    {
-        $this->detail();
+use App\Repo\ShoppingListRepo;
+use App\Model\ShoppingList;
+
+class ListController {
+    private ShoppingListRepo $repo;
+
+    public function __construct(ShoppingListRepo $repo) {
+        $this->repo = $repo;
     }
 
-    public function detail(): void
-    {
-        $list = [
-            'title' => '🎉 Party Einkaufsliste',
-            'items' => [
-                ['name' => 'Chips', 'quantity' => '3 Packungen'],
-                ['name' => 'Cola', 'quantity' => '2 Flaschen'],
-                ['name' => 'Bier', 'quantity' => '1 Kiste'],
-                ['name' => 'Plastikbecher', 'quantity' => '20 Stück'],
-            ]
-        ];
+    public function template(): void {
+        include __DIR__ . '/../Templates/new_list.php';
+    }
 
-        // ⬅️ Die $list-Variable wird vor dem include deklariert
-        include __DIR__ . '/../Templates/list_detail.php';
+    public function create(): void {
+        $name = trim($_POST['name'] ?? '');
+        $message = '';
+
+        if ($name !== '') {
+            $list = new ShoppingList(null, $name);
+            try {
+                $this->repo->create($list);
+                header("Location: index.php?controller=shoppinglist&action=index");
+                exit;
+            } catch (\Exception $e) {
+                $message = "<div class='message error'>Fehler beim Speichern: " . htmlspecialchars($e->getMessage()) . "</div>";
+            }
+        } else {
+            $message = "<div class='message error'>Bitte gib einen gültigen Listennamen ein.</div>";
+        }
+
+        include __DIR__ . '/../Templates/new_list.php';
     }
 }
