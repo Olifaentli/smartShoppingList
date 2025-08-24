@@ -28,7 +28,8 @@ class LoginController
         $password = $_POST['password'] ?? '';
 
         if (!$email || empty($password)) {
-            $_SESSION['login_message'] = '<p class="error">Login fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.</p>';
+            $message = $this->strings['login_failed'];
+            $_SESSION['login_message'] = "<p class='error'>" . htmlspecialchars($message) . "</p>";
             header("Location: index.php?controller=login");
             exit;
         }
@@ -43,7 +44,8 @@ class LoginController
             header("Location: index.php?controller=shoppinglist&action=template");
             exit;
         } else {
-            $_SESSION['login_message'] = '<p class="error">Login fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.</p>';
+            $errorMsg = $this->strings['login_failed'];
+            echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
             header("Location: index.php?controller=login");
             exit;
         }

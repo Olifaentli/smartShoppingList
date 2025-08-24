@@ -16,23 +16,24 @@ class ListController {
         include __DIR__ . '/../Templates/new_list.php';
     }
 
-    public function create(): void {
-        $name = trim($_POST['name'] ?? '');
-        $message = '';
+    public function create(): void
+    {
+        session_start();
 
-        if ($name !== '') {
-            $list = new ShoppingList(null, $name);
+        $name = trim($_POST['name'] ?? '');
+        $userId = $_SESSION['user_id'] ?? null;
+
+        if ($name && $userId) {
             try {
-                $this->repo->create($list);
-                header("Location: index.php?controller=shoppinglist&action=index");
+                $this->repo->create($name, $userId);
+                header("Location: index.php?controller=shoppinglist&action=template");
                 exit;
-            } catch (\Exception $e) {
-                $message = "<div class='message error'>Fehler beim Speichern: " . htmlspecialchars($e->getMessage()) . "</div>";
+            } catch (\PDOException $e) {
+                echo "<p class='error'>Fehler: " . htmlspecialchars($e->getMessage()) . "</p>";
             }
         } else {
-            $message = "<div class='message error'>Bitte gib einen gültigen Listennamen ein.</div>";
+            $errorMsg = $this->strings['missing_list_name_or_user'];
+            echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
         }
-
-        include __DIR__ . '/../Templates/new_list.php';
     }
 }
