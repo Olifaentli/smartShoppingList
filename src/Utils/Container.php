@@ -31,7 +31,7 @@ class Container {
         $this->controllers['login']    = new LoginController($userRepo, $this->strings);
         $this->controllers['home']     = new HomeController();
         $this->controllers['shoppinglist'] = new ShoppinglistController();
-        $this->controllers['list']     = new ListController($shoppingListRepo);
+        $this->controllers['list']     = new ListController($shoppingListRepo, $this->strings);
     }
 
     public function getController(string $name): ?object {

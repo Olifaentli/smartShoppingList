@@ -7,11 +7,12 @@ use App\Repo\UserRepo;
 class LoginController
 {
     private UserRepo $userRepo;
-    private string $message = '';
+    private array $strings;
 
-    public function __construct(UserRepo $userRepo)
+    public function __construct(UserRepo $userRepo, array $strings)
     {
         $this->userRepo = $userRepo;
+        $this->strings = $strings;
     }
 
     public function template(): void

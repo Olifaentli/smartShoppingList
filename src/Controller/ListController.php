@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Repo\ShoppingListRepo;
-use App\Model\ShoppingList;
 
 class ListController {
     private ShoppingListRepo $repo;
+    private array $strings;
 
-    public function __construct(ShoppingListRepo $repo) {
+    public function __construct(ShoppingListRepo $repo, array $strings) {
         $this->repo = $repo;
+        $this->strings = $strings;
     }
 
     public function template(): void {
