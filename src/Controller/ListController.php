@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Controller;
-
+use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
 
 class ListController {
-    private ShoppingListRepo $repo;
+    private ShoppingListRepo $shoppingListRepo;
+    private ListItemRepo $itemRepo;
     private array $strings;
 
-    public function __construct(ShoppingListRepo $repo, array $strings) {
-        $this->repo = $repo;
+    public function __construct(ShoppingListRepo $shoppingListRepo, ListItemRepo $itemRepo, array $strings)
+    {
+        $this->shoppingListRepo = $shoppingListRepo;
+        $this->itemRepo = $itemRepo;
         $this->strings = $strings;
     }
 
@@ -26,7 +29,7 @@ class ListController {
 
         if ($name && $userId) {
             try {
-                $this->repo->create($name, $userId);
+                $this->shoppingListRepo->create($name, $userId);
                 header("Location: index.php?controller=shoppinglist&action=template");
                 exit;
             } catch (\PDOException $e) {
@@ -36,5 +39,21 @@ class ListController {
             $errorMsg = $this->strings['missing_list_name_or_user'];
             echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
         }
+    }
+
+    public function detail(): void
+    {
+        $listId = $_GET['list_id'] ?? null;
+
+        if (!$listId) {
+            $errorMsg = $this->strings['no_list_error'];
+            echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
+            return;
+        }
+
+        $list = $this->shoppingListRepo->getById((int) $listId);
+        $items = $this->itemRepo->getItemsByListId((int) $listId);
+
+        include __DIR__ . '/../Templates/list_detail.php';
     }
 }

@@ -24,10 +24,12 @@ CREATE TABLE IF NOT EXISTS list_items (
     name VARCHAR(255) NOT NULL,
     amount INT DEFAULT 1,
     unit ENUM('stück', 'kg', 'gramm', 'ml', 'liter', 'cm', 'meter') DEFAULT 'stück',
+    comment VARCHAR(255),
+    is_checked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (list_id) REFERENCES shopping_lists(id) ON DELETE CASCADE
-);
+    );
 
 
 

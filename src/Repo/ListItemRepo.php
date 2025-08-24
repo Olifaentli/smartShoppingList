@@ -3,22 +3,22 @@
 namespace App\Repo;
 
 use App\Model\ListItem;
+use App\Utils\Config;
 use App\Utils\DB;
 use PDO;
 
-class ListItemRepo extends DB
+class ListItemRepo
 {
-    private DB $db;
+    private PDO $pdo;
 
     public function __construct(DB $db)
     {
-        $this->db = $db;
+        $this->pdo = $db->getInstance();
     }
 
     public function getItemsByListId(int $listId): array
     {
-        $pdo = $this->db->getInstance();
-        $stmt = $pdo->prepare("SELECT * FROM " . Config::DB_TABLE_ITEMS . " WHERE list_id = :list_id");
+        $stmt = $this->pdo->prepare("SELECT * FROM " . Config::DB_TABLE_ITEMS . " WHERE list_id = :list_id ORDER BY id DESC");
         $stmt->execute([':list_id' => $listId]);
 
         $items = [];
@@ -28,25 +28,12 @@ class ListItemRepo extends DB
                 $row['list_id'],
                 $row['name'],
                 $row['amount'],
-                $row['unit']
+                $row['unit'],
+                $row['comment'],
+                (bool) $row['is_checked']
             );
         }
 
         return $items;
-    }
-
-    public function addItem(int $listId, string $name, int $amount, string $unit): bool
-    {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO list_items (list_id, name, amount, unit)
-            VALUES (:list_id, :name, :amount, :unit)
-        ");
-
-        return $stmt->execute([
-            ':list_id' => $listId,
-            ':name'    => $name,
-            ':amount'  => $amount,
-            ':unit'    => $unit
-        ]);
     }
 }

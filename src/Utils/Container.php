@@ -6,7 +6,8 @@ use App\Controller\ListController;
 use App\Controller\RegisterController;
 use App\Controller\LoginController;
 use App\Controller\HomeController;
-use App\Controller\ShoppinglistController;
+use App\Controller\ListOverviewController;
+use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
 use App\Repo\UserRepo;
 
@@ -26,12 +27,13 @@ class Container {
     private function registerControllers(): void {
         $userRepo = new UserRepo($this->db);
         $shoppingListRepo = new ShoppingListRepo($this->db);
+        $listItemRepo = new ListItemRepo($this->db);
 
         $this->controllers['register'] = new RegisterController($userRepo, $this->strings);
         $this->controllers['login']    = new LoginController($userRepo, $this->strings);
         $this->controllers['home']     = new HomeController();
-        $this->controllers['shoppinglist'] = new ShoppinglistController();
-        $this->controllers['list']     = new ListController($shoppingListRepo, $this->strings);
+        $this->controllers['shoppinglist'] = new ListOverviewController($shoppingListRepo);
+        $this->controllers['list']     = new ListController($shoppingListRepo, $listItemRepo ,$this->strings);
     }
 
     public function getController(string $name): ?object {

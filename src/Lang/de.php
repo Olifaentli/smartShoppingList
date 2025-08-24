@@ -6,4 +6,5 @@ return [
     'login_failed' => 'Login fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.',
     'register_success' => 'Registrierung erfolgreich! Du kannst dich jetzt einloggen.',
     'missing_list_name_or_user' => 'Bitte gib einen Namen ein oder logge dich ein.',
+    'no_list_error' => 'Keine Liste gefunden.',
 ];

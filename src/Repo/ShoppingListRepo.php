@@ -20,6 +20,8 @@ class ShoppingListRepo extends DB
     {
         $pdo = $this->db->getInstance();
         $stmt = $pdo->prepare("SELECT * FROM " . Config::DB_TABLE_LISTS . " ORDER BY id DESC");
+        $stmt->execute();
+
         $lists = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
