@@ -30,7 +30,7 @@ class ListController {
         if ($name && $userId) {
             try {
                 $this->shoppingListRepo->create($name, $userId);
-                header("Location: index.php?controller=shoppinglist&action=template");
+                header("Location: index.php?controller=listoverview&action=template");
                 exit;
             } catch (\PDOException $e) {
                 echo "<p class='error'>Fehler: " . htmlspecialchars($e->getMessage()) . "</p>";

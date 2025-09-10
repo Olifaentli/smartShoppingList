@@ -17,7 +17,9 @@ class LoginController
 
     public function template(): void
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         $message = $_SESSION['login_message'] ?? '';
         unset($_SESSION['login_message']);
         include __DIR__ . '/../Templates/login.php';
@@ -25,30 +27,28 @@ class LoginController
 
     public function login(): void
     {
+        session_start();
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
+        $error = '';
 
         if (!$email || empty($password)) {
-            $message = $this->strings['login_failed'];
-            $_SESSION['login_message'] = "<p class='error'>" . htmlspecialchars($message) . "</p>";
-            header("Location: index.php?controller=login");
-            exit;
-        }
-
-        $user = $this->userRepo->getUserByEmail($email);
-
-        if ($user && password_verify($password, $user->getPassword())) {
-            session_start();
-            $_SESSION['user_id'] = $user->getId();
-            $_SESSION['email'] = $user->getEmail();
-
-            header("Location: index.php?controller=shoppinglist&action=template");
-            exit;
+            $error = $this->strings['login_failed'];
         } else {
-            $errorMsg = $this->strings['login_failed'];
-            echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
-            header("Location: index.php?controller=login");
-            exit;
+            $user = $this->userRepo->getUserByEmail($email);
+
+            if ($user && password_verify($password, $user->getPassword())) {
+                $_SESSION['user_id'] = $user->getId();
+                $_SESSION['email'] = $user->getEmail();
+
+                header("Location: index.php?controller=listoverview&action=template");
+                exit;
+            } else {
+                $error = $this->strings['login_failed'];
+            }
         }
+
+        $message = "<div class='message-error'>{$error}</div>";
+        include __DIR__ . '/../Templates/login.php';
     }
 }

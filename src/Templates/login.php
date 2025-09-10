@@ -3,8 +3,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-$message = $_SESSION['login_message'] ?? '';
-unset($_SESSION['login_message']);
 
 ?>
 
@@ -19,10 +17,8 @@ unset($_SESSION['login_message']);
                     ✅ Registrierung erfolgreich. Du kannst dich jetzt einloggen.
                 </p>
             <?php endif; ?>
-            <?php if (!empty($message)): ?>
-                <div class="message">
-                    <?= $message ?>
-                </div>
+            <?php if (!empty($error)): ?>
+                <p class="message-error"><?= htmlspecialchars($error) ?></p>
             <?php endif; ?>
 
         </div>

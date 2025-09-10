@@ -7,9 +7,7 @@
                 <h1>Registrierung</h1>
                 <p>Erstelle dein Konto für die smarte Einkaufsliste.</p>
                 <?php if (!empty($error)): ?>
-                    <p style="color: red; font-weight: bold; text-align: center;">
-                        <?= htmlspecialchars($error) ?>
-                    </p>
+                    <p class="message-error"><?= htmlspecialchars($error) ?></p>
                 <?php endif; ?>
 
             </div>

@@ -32,7 +32,7 @@ class Container {
         $this->controllers['register'] = new RegisterController($userRepo, $this->strings);
         $this->controllers['login']    = new LoginController($userRepo, $this->strings);
         $this->controllers['home']     = new HomeController();
-        $this->controllers['shoppinglist'] = new ListOverviewController($shoppingListRepo);
+        $this->controllers['listoverview'] = new ListOverviewController($shoppingListRepo);
         $this->controllers['list']     = new ListController($shoppingListRepo, $listItemRepo ,$this->strings);
     }
 

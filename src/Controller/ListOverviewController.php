@@ -13,7 +13,7 @@ class ListOverviewController
         $this->shoppingListRepo = $shoppingListRepo;
     }
 
-    public function index(): void
+    public function template(): void
     {
         $lists = $this->shoppingListRepo->getAll();
         include __DIR__ . '/../Templates/list_overview.php';

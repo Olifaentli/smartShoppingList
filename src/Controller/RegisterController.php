@@ -39,7 +39,7 @@ class RegisterController {
             $error = $this->strings['invalid_input'];
         }
 
-        $message = "<div class='message error'>{$error}</div>";
+        $message = "<div class='message-error'>{$error}</div>";
         include __DIR__ . '/../Templates/register.php';
     }
 }

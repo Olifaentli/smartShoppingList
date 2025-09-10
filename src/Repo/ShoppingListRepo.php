@@ -44,10 +44,13 @@ class ShoppingListRepo extends DB
         return null;
     }
 
-    public function create(string $name): bool
+    public function create(string $name, $userId): bool
     {
         $pdo = $this->db->getInstance();
-        $stmt = $pdo->prepare("INSERT INTO " . Config::DB_TABLE_LISTS . " (name) VALUES (:name)");
-        return $stmt->execute([':name' => $name]);
+        $stmt = $pdo->prepare("INSERT INTO " . Config::DB_TABLE_LISTS . "(name, user_id) VALUES (:name, :user_id)");
+        return $stmt->execute([
+            ':name' => $name,
+            ':user_id' => $userId
+        ]);
     }
 }
