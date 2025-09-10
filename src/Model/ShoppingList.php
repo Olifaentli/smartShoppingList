@@ -4,13 +4,16 @@ namespace App\Model;
 
 class ShoppingList
 {
-    private int $id;
+    private ?int $id;
     private string $name;
 
-    public function __construct(int $id, string $name)
+    private int $userId;
+
+    public function __construct(string $name, int $userId, ?int $id = null)
     {
-        $this->id = $id;
+        $this->userId = $userId;
         $this->name = $name;
+        $this->id = $id;
     }
 
     public function getId(): int
@@ -21,5 +24,15 @@ class ShoppingList
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getUserId(): int
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(int $userId): void
+    {
+        $this->userId = $userId;
     }
 }

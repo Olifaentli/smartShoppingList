@@ -2,15 +2,11 @@
 
 namespace App\Controller;
 
-class HomeController
+class HomeController extends BaseController
 {
-    public function template()
-    {
-        $this->index();
-    }
-
-    public function index()
+    public function template(): void
     {
         include __DIR__ . '/../Templates/home.php';
     }
+
 }

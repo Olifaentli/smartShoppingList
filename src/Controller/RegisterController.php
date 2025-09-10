@@ -2,20 +2,12 @@
 
 namespace App\Controller;
 
+use App\Exceptions\UserException;
+use App\Model\User;
 use App\Repo\UserRepo;
-use App\Utils\Config;
-use PDOException;
 
-class RegisterController {
-    private UserRepo $userRepo;
-    private array $strings;
-
-    public function __construct(UserRepo $userRepo, array $strings)
-    {
-        $this->userRepo = $userRepo;
-        $this->strings = $strings;
-    }
-
+class RegisterController extends BaseController
+{
     public function template(): void {
         include __DIR__ . '/../Templates/register.php';
     }
@@ -23,23 +15,22 @@ class RegisterController {
     public function register(): void {
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
-        $error = '';
+        $errorMessage = null;
 
-        if ($email && $password !== '') {
-            $success = $this->userRepo->createUser($email, $password);
-
-            if ($success) {
-                header("Location: index.php?controller=login&action=template&success=1");
-                exit;
-            } else {
-                $error = $this->strings['email_exists'];
+        try {
+            $newUser = new User($email, $password, null, true);
+            $user = $this->userRepo->create($newUser);
+        } catch (\Exception $exception) {
+            if (!$exception instanceof UserException) {
+                throw $exception;
             }
-
-        } else {
-            $error = $this->strings['invalid_input'];
+            $errorMessage = $exception->getUserMessage();
         }
-
-        $message = "<div class='message-error'>{$error}</div>";
+        if (!$errorMessage) {
+            header("Location: index.php?controller=login&action=template&success=1");
+            exit;
+        }
+        $message = "<div class='message-error'>{$this->translate($errorMessage)}</div>";
         include __DIR__ . '/../Templates/register.php';
     }
 }

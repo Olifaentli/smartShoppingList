@@ -23,17 +23,22 @@ class ListItemRepo
 
         $items = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $items[] = new ListItem(
-                $row['id'],
-                $row['list_id'],
-                $row['name'],
-                $row['amount'],
-                $row['unit'],
-                $row['comment'],
-                (bool) $row['is_checked']
-            );
+            $items[] = $this->mapRowToListItem($row);
         }
 
         return $items;
+    }
+
+    private function mapRowToListItem(array $row): ListItem
+    {
+        return new ListItem(
+            $row['id'],
+            $row['list_id'],
+            $row['name'],
+            $row['amount'],
+            $row['unit'],
+            $row['comment'],
+            (bool) $row['is_checked']
+        );
     }
 }

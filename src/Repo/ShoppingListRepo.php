@@ -25,7 +25,8 @@ class ShoppingListRepo extends DB
         $lists = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $lists[] = new ShoppingList($row['id'], $row['name']);
+            $lists[] = $this->mapRowToShoppingList($row);
+
         }
 
         return $lists;
@@ -38,19 +39,28 @@ class ShoppingListRepo extends DB
         $stmt->execute([':id' => $id]);
 
         if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            return new ShoppingList($row['id'], $row['name']);
+            return $this->mapRowToShoppingList($row);
         }
 
         return null;
     }
 
-    public function create(string $name, $userId): bool
+    public function create(ShoppingList $shoppingList): bool
     {
         $pdo = $this->db->getInstance();
         $stmt = $pdo->prepare("INSERT INTO " . Config::DB_TABLE_LISTS . "(name, user_id) VALUES (:name, :user_id)");
         return $stmt->execute([
-            ':name' => $name,
-            ':user_id' => $userId
+            ':name' => $shoppingList->getName(),
+            ':user_id' => $shoppingList->getUserId()
         ]);
+    }
+
+    private function mapRowToShoppingList(array $row): ShoppingList
+    {
+        return new ShoppingList(
+            $row['name'],
+            $row['user_id'],
+            $row['id']
+        );
     }
 }

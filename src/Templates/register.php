@@ -6,10 +6,9 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" alt="Warenkorb Icon" class="auth-icon">
                 <h1>Registrierung</h1>
                 <p>Erstelle dein Konto für die smarte Einkaufsliste.</p>
-                <?php if (!empty($error)): ?>
-                    <p class="message-error"><?= htmlspecialchars($error) ?></p>
+                <?php if (!empty($errorMessage)): ?>
+                    <p class="message-error"><?= htmlspecialchars($errorMessage) ?></p>
                 <?php endif; ?>
-
             </div>
 
             <form action="?controller=register&action=register" method="post" class="auth-form">

@@ -3,14 +3,17 @@
 namespace App\Controller;
 use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
+use App\Model\ShoppingList;
+use App\Repo\UserRepo;
 
-class ListController {
+class ListController extends BaseController
+{
     private ShoppingListRepo $shoppingListRepo;
     private ListItemRepo $itemRepo;
-    private array $strings;
 
-    public function __construct(ShoppingListRepo $shoppingListRepo, ListItemRepo $itemRepo, array $strings)
+    public function __construct(UserRepo $userRepo, array $strings, ShoppingListRepo $shoppingListRepo, ListItemRepo $itemRepo)
     {
+        parent::__construct($userRepo, $strings);
         $this->shoppingListRepo = $shoppingListRepo;
         $this->itemRepo = $itemRepo;
         $this->strings = $strings;
@@ -29,7 +32,7 @@ class ListController {
 
         if ($name && $userId) {
             try {
-                $this->shoppingListRepo->create($name, $userId);
+                $this->shoppingListRepo->create($newShoppingList = new ShoppingList($name, (int) $userId));
                 header("Location: index.php?controller=listoverview&action=template");
                 exit;
             } catch (\PDOException $e) {
@@ -46,7 +49,7 @@ class ListController {
         $listId = $_GET['list_id'] ?? null;
 
         if (!$listId) {
-            $errorMsg = $this->strings['no_list_error'];
+            $errorMsg = $this->translate('no_list_error');
             echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
             return;
         }

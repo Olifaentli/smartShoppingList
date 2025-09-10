@@ -14,4 +14,6 @@ class Config {
 
     // Sonstige technische Defaults
     const DEFAULT_ACTION_REGISTER = 'register';
+
+    const PUBLIC_CONTROLLERS = ['home', 'login', 'register'];
 }

@@ -7,6 +7,7 @@ use App\Controller\RegisterController;
 use App\Controller\LoginController;
 use App\Controller\HomeController;
 use App\Controller\ListOverviewController;
+use App\Controller\UserController;
 use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
 use App\Repo\UserRepo;
@@ -15,6 +16,8 @@ class Container {
     private array $controllers = [];
     private DB $db;
     private array $strings;
+
+    private array $repos = [];
 
     public function __construct() {
         $this->db = new DB();
@@ -25,15 +28,24 @@ class Container {
     }
 
     private function registerControllers(): void {
-        $userRepo = new UserRepo($this->db);
+        $userRepo = new UserRepo($this->db, $this->strings);
         $shoppingListRepo = new ShoppingListRepo($this->db);
+
+        $this->repos['user'] = $userRepo;
+        $this->repos['shoppingList'] = $shoppingListRepo;
+
         $listItemRepo = new ListItemRepo($this->db);
 
         $this->controllers['register'] = new RegisterController($userRepo, $this->strings);
         $this->controllers['login']    = new LoginController($userRepo, $this->strings);
-        $this->controllers['home']     = new HomeController();
-        $this->controllers['listoverview'] = new ListOverviewController($shoppingListRepo);
-        $this->controllers['list']     = new ListController($shoppingListRepo, $listItemRepo ,$this->strings);
+        $this->controllers['user']    = new UserController($userRepo, $this->strings);
+        $this->controllers['home']     = new HomeController($userRepo, $this->strings);
+        $this->controllers['listoverview'] = new ListOverviewController($userRepo, $this->strings, $shoppingListRepo);
+        $this->controllers['list']     = new ListController($userRepo, $this->strings, $shoppingListRepo, $listItemRepo);
+    }
+
+    public function getRepo(string $name): ?object {
+        return $this->repos[$name] ?? null;
     }
 
     public function getController(string $name): ?object {

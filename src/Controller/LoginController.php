@@ -4,22 +4,10 @@ namespace App\Controller;
 
 use App\Repo\UserRepo;
 
-class LoginController
+class LoginController extends BaseController
 {
-    private UserRepo $userRepo;
-    private array $strings;
-
-    public function __construct(UserRepo $userRepo, array $strings)
-    {
-        $this->userRepo = $userRepo;
-        $this->strings = $strings;
-    }
-
     public function template(): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
         $message = $_SESSION['login_message'] ?? '';
         unset($_SESSION['login_message']);
         include __DIR__ . '/../Templates/login.php';
@@ -27,7 +15,6 @@ class LoginController
 
     public function login(): void
     {
-        session_start();
         $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
         $password = $_POST['password'] ?? '';
         $error = '';
@@ -50,5 +37,13 @@ class LoginController
 
         $message = "<div class='message-error'>{$error}</div>";
         include __DIR__ . '/../Templates/login.php';
+    }
+
+    public function logout(): void
+    {
+        session_unset();
+        session_destroy();
+        header("Location: index.php?controller=login&action=template");
+        exit;
     }
 }

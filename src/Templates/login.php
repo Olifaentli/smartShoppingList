@@ -1,9 +1,4 @@
 <?php include __DIR__ . '/header.php';
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 ?>
 
 <main class="auth-wrap">
@@ -18,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 </p>
             <?php endif; ?>
             <?php if (!empty($error)): ?>
-                <p class="message-error"><?= htmlspecialchars($error) ?></p>
+                <p class="message-error"><?= htmlspecialchars($this->translate($error)) ?></p>
             <?php endif; ?>
 
         </div>

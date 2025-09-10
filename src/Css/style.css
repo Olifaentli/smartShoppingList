@@ -472,7 +472,85 @@ main {
     background-color: #208cf8;
 }
 
+/* 🔹 Topbar */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--main-blue);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
+.logo a {
+    text-decoration: none;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+}
 
+.logo a:hover {
+    color: #007bff;
+}
 
+.logo i {
+    font-size: 2.2rem;
+    margin-right: 0.3rem;
+}
 
+.topbar .logo {
+    font-size: 1.3rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.8rem;
+    color: white;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.avatar-btn:hover {
+    transform: scale(1.1);
+    color: #dbe9ff;
+}
+
+.btn-logout {
+    background-color: #e74c3c;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-logout i {
+    font-size: 1rem;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}

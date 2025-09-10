@@ -3,13 +3,15 @@
 namespace App\Controller;
 
 use App\Repo\ShoppingListRepo;
+use App\Repo\UserRepo;
 
-class ListOverviewController
+class ListOverviewController extends BaseController
 {
     private ShoppingListRepo $shoppingListRepo;
 
-    public function __construct(ShoppingListRepo $shoppingListRepo)
+    public function __construct(UserRepo $userRepo, array $strings, ShoppingListRepo $shoppingListRepo)
     {
+        parent::__construct($userRepo, $strings);
         $this->shoppingListRepo = $shoppingListRepo;
     }
 
