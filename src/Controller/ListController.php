@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Manager\ShoppingAiManager;
 use App\Model\ListItem;
 use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
@@ -12,18 +13,21 @@ class ListController extends BaseController
     private ShoppingListRepo $shoppingListRepo;
     private ListItemRepo $itemRepo;
 
+    private ShoppingAiManager $shoppingAiManager;
 
     public function __construct(
         UserRepo $userRepo,
         array $strings,
         ShoppingListRepo $shoppingListRepo,
         ListItemRepo $itemRepo,
+        ShoppingAiManager $shoppingAiManager
     )
     {
         parent::__construct($userRepo, $strings);
         $this->shoppingListRepo = $shoppingListRepo;
         $this->itemRepo = $itemRepo;
         $this->strings = $strings;
+        $this->shoppingAiManager = $shoppingAiManager;
     }
 
     public function template(): void {
@@ -208,4 +212,57 @@ class ListController extends BaseController
             $this->renderError('Beitritt fehlgeschlagen: ' . htmlspecialchars($e->getMessage()));
         }
     }
+
+    public function aiGenerate(): void
+    {
+        $persons     = max(1, (int)($_POST['persons'] ?? 2));
+        $meals       = max(1, (int)($_POST['meals'] ?? 5));
+        $cuisine     = trim((string)($_POST['cuisine'] ?? ''));
+        $budget      = trim((string)($_POST['budget'] ?? ''));
+        $vegetarian  = isset($_POST['vegetarian']);
+        $vegan       = isset($_POST['vegan']);
+        $allergies   = trim((string)($_POST['allergies'] ?? ''));
+        $dislikes    = trim((string)($_POST['dislikes'] ?? ''));
+        $notes       = trim((string)($_POST['notes'] ?? ''));
+        $baseListId  = (int)($_POST['base_list_id'] ?? 0);
+
+        $parts = [];
+        $parts[] = "{$persons} Personen";
+        $parts[] = "{$meals} Mahlzeiten";
+        if ($vegan) {
+            $parts[] = "vegan";
+        } elseif ($vegetarian) {
+            $parts[] = "vegetarisch";
+        }
+        if ($cuisine !== '') {
+            $parts[] = "Küche: {$cuisine}";
+        }
+        if ($budget !== '') {
+            $parts[] = "Budget ca. CHF {$budget}";
+        }
+        if ($allergies !== '') {
+            $parts[] = "Allergien/Unverträglichkeiten: {$allergies}";
+        }
+        if ($dislikes !== '') {
+            $parts[] = "Ausschlüsse: {$dislikes}";
+        }
+        if ($notes !== '') {
+            $parts[] = "Zusatzwünsche: {$notes}";
+        }
+
+        $prompt = "Erstelle eine Einkaufs- und Menüplanung basierend auf:\n- " . implode("\n- ", $parts) .
+            "\n\nLiefere nur die finalen Einkaufspositionen (keine Rezepte), " .
+            "mit sinnvollen Mengen pro Artikel. Nutze Einheiten nur aus: stück, kg, gramm, ml, liter, cm, meter. " .
+            "Wenn Mengen unsicher sind, setze amount=null.";
+
+        try {
+            $newListId = $this->shoppingAiManager->generateMenuAndCreateList($prompt, $this->getCurrentUser()->getId());
+            header('Location: index.php?controller=list&action=detail&id=' . $newListId);
+            exit;
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo "<p class='error'>Fehler beim Generieren der Liste: " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
+    }
+
 }
