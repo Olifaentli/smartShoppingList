@@ -6,8 +6,8 @@ use App\Controller\ListController;
 use App\Controller\RegisterController;
 use App\Controller\LoginController;
 use App\Controller\HomeController;
-use App\Controller\ListOverviewController;
 use App\Controller\UserController;
+use App\Manager\ShoppingAiManager;
 use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
 use App\Repo\UserRepo;
@@ -24,10 +24,10 @@ class Container {
 
         $this->strings = require __DIR__ . '/../Lang/de.php';
 
-        $this->registerControllers();
+        $this->register();
     }
 
-    private function registerControllers(): void {
+    private function register(): void {
         $userRepo = new UserRepo($this->db, $this->strings);
         $shoppingListRepo = new ShoppingListRepo($this->db);
 
@@ -35,13 +35,20 @@ class Container {
         $this->repos['shoppingList'] = $shoppingListRepo;
 
         $listItemRepo = new ListItemRepo($this->db);
+        $envPath = dirname(__DIR__) . '/.env';
+        $env = parse_ini_file($envPath);
+        $shoppingAiManager = new ShoppingAiManager(
+            $shoppingListRepo,
+            $listItemRepo,
+            $env['OPENAI_API_KEY'] ?: null,
+        );
+
 
         $this->controllers['register'] = new RegisterController($userRepo, $this->strings);
         $this->controllers['login']    = new LoginController($userRepo, $this->strings);
         $this->controllers['user']    = new UserController($userRepo, $this->strings);
         $this->controllers['home']     = new HomeController($userRepo, $this->strings);
-        $this->controllers['listoverview'] = new ListOverviewController($userRepo, $this->strings, $shoppingListRepo);
-        $this->controllers['list']     = new ListController($userRepo, $this->strings, $shoppingListRepo, $listItemRepo);
+        $this->controllers['list']     = new ListController($userRepo, $this->strings, $shoppingListRepo, $listItemRepo, $shoppingAiManager);
     }
 
     public function getRepo(string $name): ?object {

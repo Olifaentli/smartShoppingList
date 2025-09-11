@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Model\ListItem;
 use App\Repo\ListItemRepo;
 use App\Repo\ShoppingListRepo;
 use App\Model\ShoppingList;
@@ -11,7 +12,13 @@ class ListController extends BaseController
     private ShoppingListRepo $shoppingListRepo;
     private ListItemRepo $itemRepo;
 
-    public function __construct(UserRepo $userRepo, array $strings, ShoppingListRepo $shoppingListRepo, ListItemRepo $itemRepo)
+
+    public function __construct(
+        UserRepo $userRepo,
+        array $strings,
+        ShoppingListRepo $shoppingListRepo,
+        ListItemRepo $itemRepo,
+    )
     {
         parent::__construct($userRepo, $strings);
         $this->shoppingListRepo = $shoppingListRepo;
@@ -20,43 +27,185 @@ class ListController extends BaseController
     }
 
     public function template(): void {
-        include __DIR__ . '/../Templates/new_list.php';
+        $action = $this->getRequestedAction();
+        if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            include __DIR__ . '/../Templates/new_list.php';
+        } elseif ($action === 'detail' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->detail();
+        } elseif ($action === 'edit' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->edit();
+        } elseif ($action === 'join' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->join();
+        } else {
+            $this->index();
+        }
+    }
+    
+    public function index(): void {
+        $lists = $this->shoppingListRepo->getAllForUser($this->getCurrentUser()->getId());
+        include __DIR__ . '/../Templates/list_overview.php';
     }
 
     public function create(): void
     {
-        session_start();
-
         $name = trim($_POST['name'] ?? '');
-        $userId = $_SESSION['user_id'] ?? null;
+        $userId = $this->getCurrentUser()->getId();
 
-        if ($name && $userId) {
+        if (!$name && !$userId) {
+            $errorMsg = $this->strings['missing_list_name_or_user'];
+            echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
+            return;
+        }
             try {
-                $this->shoppingListRepo->create($newShoppingList = new ShoppingList($name, (int) $userId));
-                header("Location: index.php?controller=listoverview&action=template");
+                $this->shoppingListRepo->create(new ShoppingList($name, (int) $userId));
+                header("Location: index.php?controller=list&action=template");
                 exit;
             } catch (\PDOException $e) {
                 echo "<p class='error'>Fehler: " . htmlspecialchars($e->getMessage()) . "</p>";
             }
-        } else {
-            $errorMsg = $this->strings['missing_list_name_or_user'];
+
+    }
+
+    public function addItem(): void
+    {
+        $listId = $_POST['list_id'] ?? null;
+        $name = trim($_POST['name'] ?? '');
+        $amount = trim($_POST['amount'] ?? '');
+        $unit = trim($_POST['unit'] ?? '');
+        $comment = trim($_POST['comment'] ?? '');
+
+        if (!$listId || $name === '') {
+            $errorMsg = $this->strings['missing_item_name_or_list'] ?? 'Fehlender Eintrag oder Liste.';
             echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
+            return;
+        }
+
+        $allowedUnits = ['stück', 'kg', 'gramm', 'ml', 'liter', 'cm', 'meter'];
+        $unit = $unit === '' ? 'stück' : strtolower($unit);
+        if (!in_array($unit, $allowedUnits, true)) {
+            $unit = 'stück';
+        }
+
+        $amount = $amount === '' ? 0 : (int)$amount;
+
+        try {
+            $item = new ListItem((int)$listId, $name, $amount, $unit, $comment);
+            $this->itemRepo->create($item);
+            header("Location: index.php?controller=list&action=detail&id=" . urlencode($listId));
+            exit;
+        } catch (\PDOException $e) {
+            echo "<p class='error'>Fehler: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
 
-    public function detail(): void
+    public function checkItem(): void
     {
-        $listId = $_GET['list_id'] ?? null;
+        $itemId = $_POST['item_id'] ?? null;
+        $listId = $_POST['list_id'] ?? null;
 
+        if (!$itemId || !$listId) {
+            echo "<p class='error'>Ungültige Anfrage.</p>";
+            return;
+        }
+
+        try {
+            $this->itemRepo->markChecked((int)$itemId, true);
+            header("Location: index.php?controller=list&action=detail&id=" . (int)$listId);
+            exit;
+        } catch (\Exception $e) {
+            echo "<p class='error'>Fehler beim Abhaken: " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
+    }
+
+    public function edit(): void
+    {
+        $id = (int)($_GET['id'] ?? 0);
+        if (!$id) { $this->redirect('?controller=list&action=index'); }
+
+        $list = $this->shoppingListRepo->getListById($id);
+        if (!$list) {
+            $this->renderError('Liste nicht gefunden.');
+            return;
+        }
+
+        include __DIR__ . '/../Templates/list_edit.php';
+    }
+
+    public function update(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        $name = trim($_POST['name'] ?? '');
+        if (!$id || $name === '') {
+            $this->renderError('Ungültige Eingabe.');
+            return;
+        }
+
+        try {
+            $list = $this->shoppingListRepo->getListById($id);
+            $list->setName($name);
+            $this->shoppingListRepo->update($list);
+            $this->redirect('?controller=list&action=index');
+        } catch (\Throwable $e) {
+            $this->renderError('Konnte Liste nicht umbenennen: ' . htmlspecialchars($e->getMessage()));
+        }
+    }
+
+    public function delete(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        if (!$id) {
+            $this->renderError('Ungültige Anfrage.');
+            return;
+        }
+
+        try {
+            $this->shoppingListRepo->delete($id);
+            $this->redirect('?controller=list&action=index');
+        } catch (\Throwable $e) {
+            $this->renderError('Konnte Liste nicht löschen: ' . htmlspecialchars($e->getMessage()));
+        }
+    }
+
+
+    public function detail(): void {
+        $listId = $_GET['id'] ?? null;
         if (!$listId) {
             $errorMsg = $this->translate('no_list_error');
             echo "<p class='error'>" . htmlspecialchars($errorMsg) . "</p>";
             return;
         }
 
-        $list = $this->shoppingListRepo->getById((int) $listId);
+        $list = $this->shoppingListRepo->getListById((int) $listId);
         $items = $this->itemRepo->getItemsByListId((int) $listId);
 
         include __DIR__ . '/../Templates/list_detail.php';
+    }
+
+    public function join(): void
+    {
+        $user = $this->getCurrentUser();
+        if (!$user) {
+            $this->redirect('?controller=auth&action=login');
+            return;
+        }
+
+        $listId = (int)($_GET['list_id'] ?? 0);
+        if ($listId <= 0) {
+            $this->renderError('Ungültige Listen-ID.');
+            return;
+        }
+
+        try {
+            $list = $this->shoppingListRepo->getListById($listId);
+            if (!$list) {
+                $this->renderError('Liste nicht gefunden.');
+                return;
+            }
+
+            $this->shoppingListRepo->addMember($listId, $user->getId());
+            $this->redirect('?controller=list&action=detail&id=' . $listId);
+        } catch (\Throwable $e) {
+            $this->renderError('Beitritt fehlgeschlagen: ' . htmlspecialchars($e->getMessage()));
+        }
     }
 }

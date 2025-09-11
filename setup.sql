@@ -32,4 +32,10 @@ CREATE TABLE IF NOT EXISTS list_items (
     );
 
 
-
+CREATE TABLE IF NOT EXISTS shopping_list_user (
+    list_id INT NOT NULL,
+    user_id INT NOT NULL,
+    PRIMARY KEY (list_id, user_id),
+    CONSTRAINT fk_slu_list FOREIGN KEY (list_id) REFERENCES shopping_lists(id) ON DELETE CASCADE,
+    CONSTRAINT fk_slu_user FOREIGN KEY (user_id) REFERENCES users(id)          ON DELETE CASCADE
+);

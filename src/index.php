@@ -37,7 +37,7 @@ if (
     ($authRequired === false) &&
     isset($_SESSION['user_id'])
 ) {
-    header('Location: index.php?controller=listoverview&action=template');
+    header('Location: index.php?controller=list&action=template');
     exit;
 }
 

@@ -29,16 +29,42 @@ class ListItemRepo
         return $items;
     }
 
+    public function create(\App\Model\ListItem $item): void
+    {
+        $stmt = $this->pdo->prepare("
+        INSERT INTO list_items (name, amount, unit, comment, list_id)
+        VALUES (:name, :amount, :unit, :comment, :list_id)
+    ");
+        $stmt->execute([
+            ':name' => $item->getName(),
+            ':amount' => $item->getAmount(),
+            ':unit' => $item->getUnit(),
+            ':comment' => $item->getComment(),
+            ':list_id' => $item->getListId(),
+        ]);
+    }
+
+    public function markChecked(int $itemId, bool $checked = true): void
+    {
+        $stmt = $this->pdo->prepare("UPDATE list_items SET is_checked = :checked WHERE id = :id");
+        $stmt->execute([
+            ':checked' => $checked ? 1 : 0,
+            ':id' => $itemId
+        ]);
+    }
+
+
+
     private function mapRowToListItem(array $row): ListItem
     {
         return new ListItem(
-            $row['id'],
-            $row['list_id'],
+            (int) $row['list_id'],
             $row['name'],
-            $row['amount'],
+            (int) $row['amount'],
             $row['unit'],
             $row['comment'],
-            (bool) $row['is_checked']
+            (bool) $row['is_checked'],
+            (int) $row['id']
         );
     }
 }

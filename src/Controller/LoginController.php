@@ -28,7 +28,7 @@ class LoginController extends BaseController
                 $_SESSION['user_id'] = $user->getId();
                 $_SESSION['email'] = $user->getEmail();
 
-                header("Location: index.php?controller=listoverview&action=template");
+                header("Location: index.php?controller=list&action=template");
                 exit;
             } else {
                 $error = $this->strings['login_failed'];

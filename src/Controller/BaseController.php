@@ -31,4 +31,19 @@ class BaseController
         return $this->strings[$key] ?? $key;
     }
 
+    protected function getRequestedAction(): ?string
+    {
+        return $_REQUEST['action'];
+    }
+
+    protected function redirect(string $url): void
+    {
+        header("Location: $url");
+        exit;
+    }
+    protected function renderError(string $msg): void
+    {
+        echo "<p class='message-error'>".$this->translate($msg)."</p>";
+    }
+
 }
