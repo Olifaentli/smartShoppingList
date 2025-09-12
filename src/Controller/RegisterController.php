@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Exceptions\UserException;
 use App\Model\User;
-use App\Repo\UserRepo;
 
 class RegisterController extends BaseController
 {

@@ -13,7 +13,6 @@ class UserController extends BaseController
 
     public function update(): void
     {
-        session_start();
         $userId = $_SESSION['user_id'] ?? null;
         if (!$userId) {
             header('Location: index.php?controller=login&action=template');
@@ -51,7 +50,7 @@ class UserController extends BaseController
         }
 
         if ($errors) {
-            $_SESSION['user_message'] = "<div class='message-error'>" . implode('<br>', array_map('htmlspecialchars', $errors)) . "</div>";
+            $_SESSION['user_message'] = "<p class='message-error'>" . implode('<br>', array_map('htmlspecialchars', $errors)) . "</p>";
             header('Location: index.php?controller=user&action=template');
             exit;
         }
@@ -63,7 +62,7 @@ class UserController extends BaseController
         }
         $this->userRepo->update($user);
 
-        $_SESSION['user_message'] = "<div class='message-success'>Profil erfolgreich aktualisiert.</div>";
+        $_SESSION['user_message'] = "<p class='message-success'>Profil erfolgreich aktualisiert.</p>";
 
         header('Location: index.php?controller=user&action=template');
         exit;

@@ -8,7 +8,6 @@
         <?php if (empty($items)): ?>
         <p>Keine Einträge vorhanden.</p>
         <?php else: ?>
-            <!-- Offene Einträge -->
             <ul class="list-items">
                 <?php foreach ($items as $item): ?>
                     <?php if (!$item->isChecked()): ?>
@@ -23,7 +22,7 @@
                     <?php endif; ?>
                 </span>
 
-                            <form method="post" action="index.php?controller=list&action=checkItem" style="margin:0;">
+                            <form method="post" action="?controller=list&action=checkItem" style="margin:0;">
                                 <input type="hidden" name="item_id" value="<?= $item->getId() ?>">
                                 <input type="hidden" name="list_id" value="<?= $list->getId() ?>">
                                 <button type="submit" class="btn-open" aria-label="Abhaken">✓</button>
@@ -53,7 +52,6 @@
                             <small class="subtext"> — <?= htmlspecialchars($item->getComment()) ?></small>
                         <?php endif; ?>
                     </span>
-                                <!-- kein Button bei erledigten Einträgen -->
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>

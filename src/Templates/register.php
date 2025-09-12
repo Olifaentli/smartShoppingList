@@ -19,7 +19,9 @@
                 <input type="password" id="password" name="password" required>
 
                 <button type="submit">Registrieren</button>
-
+                <p class="auth-switch">
+                    Schon ein Konto? <a href="?controller=login&action=template">Jetzt einloggen</a>
+                </p>
                 <p class="fun-text">💡 Wusstest du? Die meisten Leute vergessen Knoblauch auf der Liste 🧄</p>
             </form>
         </section>

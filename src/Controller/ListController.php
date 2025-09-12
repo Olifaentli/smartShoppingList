@@ -12,7 +12,6 @@ class ListController extends BaseController
 {
     private ShoppingListRepo $shoppingListRepo;
     private ListItemRepo $itemRepo;
-
     private ShoppingAiManager $shoppingAiManager;
 
     public function __construct(
@@ -32,6 +31,7 @@ class ListController extends BaseController
 
     public function template(): void {
         $action = $this->getRequestedAction();
+
         if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             include __DIR__ . '/../Templates/new_list.php';
         } elseif ($action === 'detail' && $_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -40,6 +40,8 @@ class ListController extends BaseController
             $this->edit();
         } elseif ($action === 'join' && $_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->join();
+        } elseif ($action === 'aiForm' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            $this->aiForm();
         } else {
             $this->index();
         }
@@ -263,6 +265,11 @@ class ListController extends BaseController
             http_response_code(500);
             echo "<p class='error'>Fehler beim Generieren der Liste: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
+    }
+
+    public function aiForm(): void
+    {
+        include __DIR__ . '/../Templates/ai_form.php';
     }
 
 }
