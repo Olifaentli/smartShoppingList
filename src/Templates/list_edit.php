@@ -2,16 +2,27 @@
 
 <main class="shopping-wrap">
     <section class="shopping-card">
-        <h1>Liste umbenennen</h1>
-        <p class="subtext">Ändere den Namen deiner Einkaufsliste.</p>
+        <h1><i class="bi bi-pencil-square"></i> <?= $this->translate('rename_list_title') ?></h1>
+        <p class="subtext"><?= $this->translate('rename_list_subtext') ?></p>
 
-        <form method="post" action="?controller=list&action=update" class="add-item-form" style="max-width:480px;">
+        <form method="post" action="?controller=list&action=update" class="auth-form">
+
             <input type="hidden" name="id" value="<?= $list->getId() ?>">
-            <label for="name">Neuer Listenname</label>
+
+            <label for="name"><?= $this->translate('new_list_name') ?></label>
             <input id="name" name="name" type="text" value="<?= htmlspecialchars($list->getName()) ?>" required>
-            <button type="submit">Speichern</button>
-            <a class="btn-back" href="?controller=list&action=index" style="margin-left:.5rem;">Abbrechen</a>
+
+            <div class="btn-center">
+                <button type="submit" class="btn-create">
+                    <i class="bi bi-check-circle"></i> <?= $this->translate('save_button') ?>
+                </button>
+                <a href="?controller=list&action=index" class="btn-back">
+                    <i class="bi bi-x-circle"></i> <?= $this->translate('cancel_button') ?>
+                </a>
+            </div>
+
         </form>
+
     </section>
 </main>
 

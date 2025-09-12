@@ -56,8 +56,6 @@ class ShoppingListRepo extends DB
         return $lists;
     }
 
-
-
     public function getListById(int $id): ?ShoppingList
     {
         $pdo = $this->db->getInstance();
@@ -70,6 +68,8 @@ class ShoppingListRepo extends DB
 
         return null;
     }
+
+
 
     public function create(ShoppingList $shoppingList): int
     {
@@ -138,10 +138,21 @@ class ShoppingListRepo extends DB
 
     private function mapRowToShoppingList(array $row): ShoppingList
     {
-        return new ShoppingList(
+        $list = new ShoppingList(
             $row['name'],
-            $row['user_id'],
-            $row['id']
+            (int)$row['user_id'],
+            (int)$row['id']
         );
+
+        $pdo = $this->db->getInstance();
+        $stmt = $pdo->prepare("SELECT user_id FROM " . Config::DB_TABLE_LISTS_USERS . " WHERE list_id = :list_id");
+        $stmt->execute(['list_id' => $row['id']]);
+        $members = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        foreach ($members as $memberId) {
+            $list->addMember((int)$memberId);
+        }
+
+        return $list;
     }
 }

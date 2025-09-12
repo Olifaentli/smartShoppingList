@@ -1,100 +1,93 @@
 <?php include __DIR__ . '/header.php'; ?>
-<main class="list-detail-wrap">
-    <section class="list-detail-card">
-        <h1><?= $list->getName() ?? '📝 Einkaufsliste' ?></h1>
 
-        <h2>📝 Einträge</h2>
+<main class="list-detail-wrap">
+    <section class="shopping-card">
+        <h1><i class="bi bi-card-checklist"></i> <?= htmlspecialchars($list->getName()) ?></h1>
+
+        <h2><i class="bi bi-list-task"></i> <?= $this->translate('list_items_title') ?></h2>
 
         <?php if (empty($items)): ?>
-        <p>Keine Einträge vorhanden.</p>
+            <p class="subtext"><?= $this->translate('no_items') ?></p>
         <?php else: ?>
             <ul class="list-items">
                 <?php foreach ($items as $item): ?>
                     <?php if (!$item->isChecked()): ?>
                         <li>
-                <span>
-                    <span class="qty">
-                        <?= htmlspecialchars($item->getAmount()) . ' ' . htmlspecialchars($item->getUnit()) ?>
-                    </span>
-                    <?= htmlspecialchars($item->getName()) ?>
-                    <?php if ($item->getComment()): ?>
-                        <small class="subtext"> — <?= htmlspecialchars($item->getComment()) ?></small>
-                    <?php endif; ?>
-                </span>
-
-                            <form method="post" action="?controller=list&action=checkItem" style="margin:0;">
+                            <span>
+                                <span class="qty"><?= htmlspecialchars($item->getAmount()) . ' ' . htmlspecialchars($item->getUnit()) ?></span>
+                                <?= htmlspecialchars($item->getName()) ?>
+                                <?php if ($item->getComment()): ?>
+                                    <small class="subtext"> — <?= htmlspecialchars($item->getComment()) ?></small>
+                                <?php endif; ?>
+                            </span>
+                            <form method="post" action="?controller=list&action=checkItem" class="inline-form">
                                 <input type="hidden" name="item_id" value="<?= $item->getId() ?>">
                                 <input type="hidden" name="list_id" value="<?= $list->getId() ?>">
-                                <button type="submit" class="btn-open" aria-label="Abhaken">✓</button>
+                                <button type="submit" class="btn-open" aria-label="<?= $this->translate('mark_done') ?>">
+                                    <i class="bi bi-check2-circle"></i>
+                                </button>
                             </form>
                         </li>
                     <?php endif; ?>
                 <?php endforeach; ?>
             </ul>
 
-            <?php
-            $hasChecked = false;
-            foreach ($items as $it) { if ($it->isChecked()) { $hasChecked = true; break; } }
-            ?>
-
-            <?php if ($hasChecked): ?>
-                <h3>Erledigt</h3>
+            <?php if (array_filter($items, fn($i) => $i->isChecked())): ?>
+                <h3><i class="bi bi-check-all"></i> <?= $this->translate('done_title') ?></h3>
                 <ul class="list-items">
                     <?php foreach ($items as $item): ?>
                         <?php if ($item->isChecked()): ?>
                             <li class="checked">
-                    <span>
-                        <span class="qty">
-                            <?= htmlspecialchars($item->getAmount()) . ' ' . htmlspecialchars($item->getUnit()) ?>
-                        </span>
-                        <?= htmlspecialchars($item->getName()) ?>
-                        <?php if ($item->getComment()): ?>
-                            <small class="subtext"> — <?= htmlspecialchars($item->getComment()) ?></small>
-                        <?php endif; ?>
-                    </span>
+                                <span>
+                                    <span class="qty"><?= htmlspecialchars($item->getAmount()) . ' ' . htmlspecialchars($item->getUnit()) ?></span>
+                                    <?= htmlspecialchars($item->getName()) ?>
+                                    <?php if ($item->getComment()): ?>
+                                        <small class="subtext"> — <?= htmlspecialchars($item->getComment()) ?></small>
+                                    <?php endif; ?>
+                                </span>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
         <?php endif; ?>
-        <h2>➕ Neuen Eintrag hinzufügen</h2>
+
+        <h2><i class="bi bi-plus-circle"></i> <?= $this->translate('add_item') ?></h2>
         <form action="?controller=list&action=addItem" method="POST" class="add-item-form">
             <input type="hidden" name="list_id" value="<?= (int) $listId ?>">
 
-            <label for="name">Name:</label>
+            <label for="name"><?= $this->translate('item_name') ?></label>
             <input type="text" id="name" name="name" required>
 
-            <label for="amount">Menge:</label>
+            <label for="amount"><?= $this->translate('item_amount') ?></label>
             <input type="text" id="amount" name="amount">
 
-            <label for="unit">Einheit:</label>
+            <label for="unit"><?= $this->translate('item_unit') ?></label>
             <select id="unit" name="unit">
-                <option value="">– keine –</option>
-                <option value="stk">Stk</option>
-                <option value="kg">kg</option>
-                <option value="g">g</option>
-                <option value="l">l</option>
-                <option value="ml">ml</option>
-                <option value="pack">Pack</option>
-                <option value="dose">Dose</option>
-                <option value="bund">Bund</option>
+                <option value=""><?= $this->translate('unit_none') ?></option>
+                <option value="stück"><?= $this->translate('unit_piece') ?></option>
+                <option value="kg"><?= $this->translate('unit_kilogram') ?></option>
+                <option value="gramm"><?= $this->translate('unit_gram') ?></option>
+                <option value="liter"><?= $this->translate('unit_liter') ?></option>
+                <option value="ml"><?= $this->translate('unit_milliliter') ?></option>
+                <option value="cm"><?= $this->translate('unit_centimeter') ?></option>
+                <option value="meter"><?= $this->translate('unit_meter') ?></option>
             </select>
 
-            <label for="comment">Kommentar:</label>
+            <label for="comment"><?= $this->translate('item_comment') ?></label>
             <input type="text" id="comment" name="comment">
 
-            <button type="submit">✅ Hinzufügen</button>
+            <button type="submit" class="btn-create">
+                <i class="bi bi-plus-circle"></i> <?= $this->translate('add_button') ?>
+            </button>
         </form>
-        <div class="btn-center">
-            <a href="?controller=list&action=index" class="back-btn">🔙 Zurück zur Übersicht</a>
-        </div>
 
+        <div class="btn-center">
+            <a href="?controller=list&action=index" class="btn-back">
+                <i class="bi bi-arrow-left"></i> <?= $this->translate('back_to_overview') ?>
+            </a>
+        </div>
     </section>
 </main>
 
 <?php include __DIR__ . '/footer.php'; ?>
-
-
-
-

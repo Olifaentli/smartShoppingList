@@ -49,6 +49,7 @@ class ListController extends BaseController
     
     public function index(): void {
         $lists = $this->shoppingListRepo->getAllForUser($this->getCurrentUser()->getId());
+        $currentUserId = $this->getCurrentUser()->getId();
         include __DIR__ . '/../Templates/list_overview.php';
     }
 

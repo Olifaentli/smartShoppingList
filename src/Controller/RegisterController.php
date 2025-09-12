@@ -18,18 +18,21 @@ class RegisterController extends BaseController
 
         try {
             $newUser = new User($email, $password, null, true);
-            $user = $this->userRepo->create($newUser);
+            $this->userRepo->create($newUser);
         } catch (\Exception $exception) {
-            if (!$exception instanceof UserException) {
+            if ($exception instanceof UserException) {
+                $errorMessage = $exception->getUserMessage();
+            } else {
                 throw $exception;
             }
-            $errorMessage = $exception->getUserMessage();
         }
+
         if (!$errorMessage) {
-            header("Location: index.php?controller=login&action=template&success=1");
+            $_SESSION['user_message'] = "<div class='message-success'>".$this->translate('register_success')."</div>";
+            header("Location: index.php?controller=login&action=template");
             exit;
         }
-        $message = "<div class='message-error'>{$this->translate($errorMessage)}</div>";
+
         include __DIR__ . '/../Templates/register.php';
     }
 }

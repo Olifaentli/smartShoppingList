@@ -1,38 +1,41 @@
-<?php include __DIR__ . '/header.php';
-?>
+<?php include __DIR__ . '/header.php'; ?>
 
 <main class="auth-wrap">
     <section class="auth-card">
         <div class="auth-head">
-            <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" alt="Warenkorb Icon" class="auth-icon">
-            <h1>Login</h1>
-            <p>Melde dich an, um deine smarte Einkaufsliste zu verwalten.</p>
-            <?php if (!empty($_GET['success'])): ?>
-                <p style="color: green; font-weight: bold; text-align: center;">
-                    ✅ Registrierung erfolgreich. Du kannst dich jetzt einloggen.
-                </p>
-            <?php endif; ?>
-            <?php if (!empty($error)): ?>
-                <p class="message-error"><?= htmlspecialchars($this->translate($error)) ?></p>
+            <i class="bi bi-box-arrow-in-right auth-icon"></i>
+            <h1><?= $this->translate('login_title') ?></h1>
+            <p><?= $this->translate('login_subtitle') ?></p>
+
+            <?php if (!empty($_SESSION['user_message'])): ?>
+                <?= $_SESSION['user_message']; unset($_SESSION['user_message']); ?>
             <?php endif; ?>
 
+            <?php if (!empty($error)): ?>
+                <p class="message-error">
+                    <i class="bi bi-exclamation-circle"></i> <?= $this->translate($error) ?>
+                </p>
+            <?php endif; ?>
         </div>
 
         <form action="?controller=login&action=login" method="post" class="auth-form">
-            <label for="email">E-Mail-Adresse</label>
+            <label for="email"><?= $this->translate('email_label') ?></label>
             <input type="email" id="email" name="email" required>
 
-            <label for="password">Passwort</label>
+            <label for="password"><?= $this->translate('password_label') ?></label>
             <input type="password" id="password" name="password" required>
 
-            <button type="submit">Anmelden</button>
+            <button type="submit">
+                <i class="bi bi-box-arrow-in-right"></i> <?= $this->translate('login_button') ?>
+            </button>
         </form>
 
         <p class="auth-switch">
-            Noch keinen Account? <a href="?controller=register&action=template">Jetzt registrieren</a>
+            <?= $this->translate('no_account') ?>
+            <a href="?controller=register&action=template"><?= $this->translate('register_link') ?></a>
         </p>
 
-        <p class="fun-text">🔒 Dein Kühlschrank verrät nichts – deine Daten auch nicht!</p>
+        <p class="fun-text"><?= $this->translate('fun_fact_login') ?></p>
     </section>
 </main>
 

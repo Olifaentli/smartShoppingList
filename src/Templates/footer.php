@@ -1,6 +1,6 @@
 <footer class="main-footer">
-    <p>&copy; <?php echo date("Y"); ?> SmartShoppingList 🍅</p>
-    <p class="footer-fun">Wusstest du? 92 % aller spontanen Einkäufe enthalten Schokolade. Zufall? 😏</p>
+    <p>&copy; <?= date("Y"); ?> <?= $this->translate('app_name') ?> 🍅</p>
+    <p class="footer-fun"><?= $this->translate('footer_fun') ?></p>
 </footer>
 </div>
 </body>
